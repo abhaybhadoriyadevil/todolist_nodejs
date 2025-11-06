@@ -24,7 +24,7 @@ body {
     background: var(--bg-color);
     color: var(--text-color);
     min-height: 100vh;
-    padding: 2rem;
+    padding: 0.5rem ;
     overflow-x: hidden;
 }
 
@@ -39,7 +39,7 @@ body {
     box-shadow: 0 8px 32px rgba(0, 229, 255, 0.1);
     display: flex;
     flex-direction: column;
-    height: 90vh;
+    /* height: 90vh; */
 }
 
 .todo-container h1 {
@@ -210,7 +210,7 @@ label {
     box-shadow: 0 8px 32px rgba(0, 229, 255, 0.1);
     display: flex;
     flex-direction: column;
-    height: 90vh;
+    /* height: 90vh; */
 }
 
 .todo-header {
@@ -913,3 +913,7 @@ h1 {
 }
 
 /* End futuristic button rules */
+.task-view-mode{ 
+    margin-left: 10px !important;
+
+}
