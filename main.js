@@ -3,6 +3,7 @@ const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
+const mongoose = require('./config/db');
 const todoController = require('./controllers/todo.Controller');
 const path = require('path');
 

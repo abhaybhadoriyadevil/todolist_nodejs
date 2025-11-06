@@ -34,9 +34,10 @@
     </div>
 
     <!-- Todos list with CRUD operations -->
-    <ul class="todo-list scrollable">
-        <% if (todos && todos.length > 0) { %>
-            <% todos.forEach(function(todo) { %>
+    <div class="tasks-list-container">
+        <ul class="todo-list">
+            <% if (todos && todos.length > 0) { %>
+                <% todos.forEach(function(todo) { %>
                 <li class="todo-item" data-id="<%= todo._id %>" data-status="<%= todo.status %>" data-priority="<%= todo.priority %>" data-category="<%= todo.category %>">
                     <div class="task-details <%= todo.priority === 'high' ? 'priority-high' : todo.priority === 'low' ? 'priority-low' : 'priority-medium' %>">
                         <!-- View Mode -->
@@ -143,7 +144,8 @@
         <% } else { %>
             <li class="no-todos">No tasks found. Add some tasks from the home page!</li>
         <% } %>
-    </ul>
+        </ul>
+    </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>

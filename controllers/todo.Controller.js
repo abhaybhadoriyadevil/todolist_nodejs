@@ -1,4 +1,5 @@
 // Enhanced Todo Controller with Error Handling and Advanced Features
+const mongoose = require('mongoose');
 const Todo = require('../models/todo.models');
 
 /**
@@ -125,12 +126,7 @@ exports.addTodo = async (req, res) => {
       priority,
       category,
       tags,
-      estimatedTime,
-      isRecurring,
-      frequency,
-      recurringEndDate,
-      reminders,
-      subtasks
+      estimatedTime
     } = req.body;
 
     // Validate input
@@ -142,14 +138,6 @@ exports.addTodo = async (req, res) => {
     // Process tags
     const processedTags = tags ? tags.split(',').map(tag => tag.trim()) : [];
 
-    // Process subtasks
-    const processedSubtasks = subtasks ? JSON.parse(subtasks) : [];
-
-    // Process reminders
-    const processedReminders = reminders ? reminders.split(',').map(date => ({
-      date: new Date(date.trim())
-    })) : [];
-
     const todo = new Todo({
       title: title.trim(),
       description: description ? description.trim() : '',
@@ -158,13 +146,6 @@ exports.addTodo = async (req, res) => {
       category: category || 'general',
       tags: processedTags,
       estimatedTime: parseInt(estimatedTime) || null,
-      subtasks: processedSubtasks,
-      reminders: processedReminders,
-      recurring: isRecurring ? {
-        isRecurring: true,
-        frequency: frequency || 'daily',
-        endDate: recurringEndDate || null
-      } : { isRecurring: false, frequency: 'none' },
       createdAt: new Date()
     });
 
@@ -227,35 +208,32 @@ exports.toggleTodo = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
   try {
     const { id } = req.params;
-    const todo = await Todo.findById(id);
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.error('Delete failed: Invalid ID format');
+      req.flash('error', 'Invalid task ID format');
+      return res.redirect('/todos');
+    }
 
-    if (!todo) {
+    console.log('Attempting to delete todo with ID:', id);
+
+    const result = await Todo.findByIdAndDelete(id);
+    
+    if (!result) {
+      console.error('Delete failed: Task not found with ID:', id);
       req.flash('error', 'Task not found');
-      return res.redirect('/');
+      return res.redirect('/todos');
     }
 
-    await Todo.findByIdAndRemove(id);
+    console.log('Successfully deleted todo with ID:', id);
+    req.flash('success', 'Task successfully deleted');
+    
+    return res.redirect('/todos');
 
-    // For AJAX requests
-    if (req.xhr) {
-      return res.json({ 
-        success: true, 
-        message: 'Task deleted successfully' 
-      });
-    }
-
-    req.flash('success', 'Task deleted successfully');
-    res.redirect('/');
   } catch (error) {
-    console.error('Error deleting todo:', error);
-    if (req.xhr) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Failed to delete task' 
-      });
-    }
-    req.flash('error', 'Failed to delete task');
-    res.redirect('/');
+    console.error('Error in deleteTodo:', error);
+    req.flash('error', 'Failed to delete task. Please try again.');
+    return res.redirect('/todos');
   }
 };
 

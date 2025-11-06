@@ -1,11 +1,11 @@
-/* Modern Neo Task List Styling */
+/* Modern Apna Kaam List Styling */
 :root {
     --bg-color: #0d1117;
     --primary-color: #4a90e2;
     --accent-color: #00e5ff;
     --card-bg: rgba(255, 255, 255, 0.05);
-    --text-color: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-color: #3dd2e2;
+    --text-secondary: rgba(208, 213, 209, 0.7);
     --success-color: #2ecc71;
     --error-color: #e74c3c;
 }
@@ -83,7 +83,7 @@ body {
     padding: 0.8rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(5, 4, 4, 0.1);
     color: var(--text-color);
 }
 
@@ -698,3 +698,218 @@ h1 {
         padding: 0 1rem;
     }
 }
+
+/* -------------------------------------------------- */
+/* Fancy animated bordered button (scoped to .button) */
+/* This only targets elements using the .button class and
+   the required span children; it does NOT change global
+   element or body styles. */
+/* Usage: <a href="#" class="button"><span></span><span></span><span></span><span></span>Button</a> */
+
+.button {
+    position: relative;
+    display: inline-block;
+    padding: 18px 40px;
+    color: #1670f0;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 4px;
+    font-size: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    overflow: hidden;
+    background: transparent;
+    border-radius: 6px;
+}
+
+.button::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    bottom: 2px;
+    width: 50%;
+    background: rgba(255,255,255,0.03);
+    pointer-events: none;
+}
+
+.button span {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+}
+
+.button span:nth-child(1) {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #0c002b, #1779ff);
+    animation: button-anim-x 2s linear infinite;
+    animation-delay: 1s;
+}
+
+.button span:nth-child(2) {
+    top: 0;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, #0c002b, #1779ff);
+    animation: button-anim-y 2s linear infinite;
+    animation-delay: 1.5s;
+}
+
+.button span:nth-child(3) {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to left, #0c002b, #1779ff);
+    animation: button-anim-x 2s linear infinite;
+    animation-delay: 2s;
+}
+
+.button span:nth-child(4) {
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to top, #0c002b, #1779ff);
+    animation: button-anim-y 2s linear infinite;
+    animation-delay: 2.5s;
+}
+
+@keyframes button-anim-x {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes button-anim-y {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+/* Small helper for keyboard focus - keeps behavior accessible */
+.button:focus {
+    outline: 2px solid rgba(23,121,255,0.25);
+    outline-offset: 4px;
+}
+
+/* End animated .button rules */
+
+/* -------------------------------------------------- */
+/* Futuristic / neon glass styles for action buttons   */
+/* Targets buttons used in todos view:                  */
+/* .edit-btn, .status-btn (+ .complete-btn/.undo-btn), */
+/* .delete-btn, .save-btn, .cancel-btn                 */
+/* These rules are appended so they override earlier    */
+/* button styles without changing markup or behavior.   */
+
+.edit-btn,
+.status-btn,
+.delete-btn,
+.save-btn,
+.cancel-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    color: #e6f3ff;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    box-shadow: 0 6px 20px rgba(23,121,255,0.06), 0 0 18px rgba(23,121,255,0.03) inset;
+    backdrop-filter: blur(6px) saturate(120%);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.92rem;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.12s ease;
+}
+
+.edit-btn i,
+.status-btn i,
+.delete-btn i,
+.save-btn i,
+.cancel-btn i { /* make sure icons align */
+    font-size: 0.95rem;
+    opacity: 0.95;
+}
+
+.edit-btn {
+    --g1: rgba(56, 95, 255, 0.18);
+    background-image: linear-gradient(135deg, rgba(22, 112, 240, 0.14), rgba(46, 204, 255, 0.03));
+    border: 1px solid rgba(46, 130, 255, 0.18);
+    box-shadow: 0 8px 26px rgba(23,121,255,0.12), 0 0 12px rgba(46,130,255,0.06) inset;
+}
+
+.status-btn {
+    --accent: rgba(0, 230, 188, 0.12);
+    background-image: linear-gradient(135deg, rgba(0,230,188,0.06), rgba(0,0,0,0.02));
+    border: 1px solid rgba(0,230,188,0.12);
+    box-shadow: 0 8px 22px rgba(0,230,188,0.06), 0 0 10px rgba(0,230,188,0.03) inset;
+    color: #eafff6;
+}
+
+.complete-btn { /* positive */
+    background-image: linear-gradient(135deg, rgba(34,197,94,0.14), rgba(34,197,94,0.04));
+    border: 1px solid rgba(34,197,94,0.16);
+    box-shadow: 0 8px 22px rgba(34,197,94,0.08), 0 0 10px rgba(34,197,94,0.04) inset;
+}
+
+.undo-btn { /* undo / neutral */
+    background-image: linear-gradient(135deg, rgba(243,156,18,0.12), rgba(243,156,18,0.03));
+    border: 1px solid rgba(243,156,18,0.14);
+    box-shadow: 0 8px 22px rgba(243,156,18,0.06), 0 0 10px rgba(243,156,18,0.03) inset;
+}
+
+.delete-btn { /* destructive */
+    background-image: linear-gradient(135deg, rgba(231,76,60,0.12), rgba(231,76,60,0.03));
+    border: 1px solid rgba(231,76,60,0.16);
+    box-shadow: 0 10px 28px rgba(231,76,60,0.09), 0 0 12px rgba(231,76,60,0.04) inset;
+}
+
+.edit-btn:hover,
+.status-btn:hover,
+.delete-btn:hover,
+.save-btn:hover,
+.cancel-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 18px 40px rgba(23,121,255,0.14), 0 0 24px rgba(23,121,255,0.06) inset;
+    opacity: 0.98;
+}
+
+/* subtle neon edge glow using pseudo-element */
+.edit-btn::after,
+.status-btn::after,
+.delete-btn::after,
+.save-btn::after,
+.cancel-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    padding: 2px; /* works with box-shadow to create glow */
+    pointer-events: none;
+    box-shadow: 0 0 18px rgba(23,121,255,0.045);
+    mix-blend-mode: screen;
+    transition: box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.edit-btn:focus,
+.status-btn:focus,
+.delete-btn:focus,
+.save-btn:focus,
+.cancel-btn:focus {
+    outline: 2px solid rgba(46,130,255,0.18);
+    outline-offset: 4px;
+}
+
+/* make small buttons a bit more compact on small screens */
+@media (max-width: 480px) {
+    .edit-btn, .status-btn, .delete-btn, .save-btn, .cancel-btn {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.86rem;
+    }
+}
+
+/* End futuristic button rules */
