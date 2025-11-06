@@ -2,26 +2,62 @@
 const Todo = require('../models/todo.models');
 
 /**
- * Get todos with filtering, sorting, and pagination
+ * Get todos with filtering, sorting, and pagination for todos page
  */
 exports.getTodos = async (req, res) => {
-  try {
-    const {
-      search = '',
-      sort = 'createdAt',
-      order = 'desc',
-      status = 'all',
-      page = 1,
-      limit = 10
-    } = req.query;
+    try {
+        const {
+            search = '',
+            sort = 'createdAt',
+            order = 'desc',
+            status = 'all',
+            priority = 'all',
+            category = 'all',
+            tag = '',
+            startDate = '',
+            endDate = '',
+            page = 1,
+            limit = 10
+        } = req.query;
 
     // Build filter conditions
     const filter = {};
+    
+    // Text search
     if (search) {
-      filter.task = { $regex: search, $options: 'i' };
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { tags: { $in: [new RegExp(search, 'i')] } }
+      ];
     }
+
+    // Status filter
     if (status !== 'all') {
-      filter.completed = status === 'completed';
+      filter.status = status;
+    }
+
+    // Priority filter
+    if (priority !== 'all') {
+      filter.priority = priority;
+    }
+
+    // Category filter
+    if (category !== 'all') {
+      filter.category = category;
+    }
+
+    // Tag filter
+    if (tag) {
+      filter.tags = { $in: [tag] };
+    }
+
+    // Date range filter
+    if (startDate && endDate) {
+      filter.dueDate = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
     }
 
     // Calculate pagination
@@ -39,19 +75,29 @@ exports.getTodos = async (req, res) => {
 
     const pageCount = Math.ceil(total / limit);
 
+    // Get statistics
+    const stats = await Todo.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
     // Prepare flash messages if available
     const successMessage = req.flash ? req.flash('success') : null;
     
-    res.render('index', {
-      todos,
-      currentPage: page,
-      pageCount,
-      total,
-      search,
-      status,
-      sort,
-      order,
-      success: successMessage
+    res.render('pages/todos', {
+        todos,
+        total,
+        search,
+        status,
+        sort,
+        order,
+        success: successMessage,
+        error: req.flash('error'),
+        stats
     });
   } catch (error) {
     console.error('Error fetching todos:', error);
@@ -72,19 +118,53 @@ exports.getTodos = async (req, res) => {
  */
 exports.addTodo = async (req, res) => {
   try {
-    const { task, category, dueDate, priority } = req.body;
+    const {
+      title,
+      description,
+      dueDate,
+      priority,
+      category,
+      tags,
+      estimatedTime,
+      isRecurring,
+      frequency,
+      recurringEndDate,
+      reminders,
+      subtasks
+    } = req.body;
 
     // Validate input
-    if (!task || task.trim().length === 0) {
-      req.flash('error', 'Task cannot be empty');
+    if (!title || title.trim().length === 0) {
+      req.flash('error', 'Task title cannot be empty');
       return res.redirect('/');
     }
 
+    // Process tags
+    const processedTags = tags ? tags.split(',').map(tag => tag.trim()) : [];
+
+    // Process subtasks
+    const processedSubtasks = subtasks ? JSON.parse(subtasks) : [];
+
+    // Process reminders
+    const processedReminders = reminders ? reminders.split(',').map(date => ({
+      date: new Date(date.trim())
+    })) : [];
+
     const todo = new Todo({
-      task: task.trim(),
-      category: category || 'general',
+      title: title.trim(),
+      description: description ? description.trim() : '',
       dueDate: dueDate || null,
       priority: priority || 'medium',
+      category: category || 'general',
+      tags: processedTags,
+      estimatedTime: parseInt(estimatedTime) || null,
+      subtasks: processedSubtasks,
+      reminders: processedReminders,
+      recurring: isRecurring ? {
+        isRecurring: true,
+        frequency: frequency || 'daily',
+        endDate: recurringEndDate || null
+      } : { isRecurring: false, frequency: 'none' },
       createdAt: new Date()
     });
 
@@ -112,7 +192,9 @@ exports.toggleTodo = async (req, res) => {
     }
 
     todo.completed = !todo.completed;
-    todo.completedAt = todo.completed ? new Date() : null;
+  todo.completedAt = todo.completed ? new Date() : null;
+  // keep status in sync
+  todo.status = todo.completed ? 'completed' : 'pending';
     await todo.save();
 
     // For AJAX requests
@@ -183,11 +265,11 @@ exports.deleteTodo = async (req, res) => {
 exports.updateTodo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { task, category, dueDate, priority } = req.body;
+    const { title, description, category, dueDate, priority, tags, estimatedTime } = req.body;
 
     // Validate input
-    if (!task || task.trim().length === 0) {
-      req.flash('error', 'Task cannot be empty');
+    if (!title || title.trim().length === 0) {
+      req.flash('error', 'Task title cannot be empty');
       return res.redirect('/');
     }
 
@@ -197,10 +279,13 @@ exports.updateTodo = async (req, res) => {
       return res.redirect('/');
     }
 
-    todo.task = task.trim();
-    todo.category = category;
-    todo.dueDate = dueDate;
-    todo.priority = priority;
+    todo.title = title.trim();
+    todo.description = description || '';
+    todo.category = category || todo.category;
+    todo.dueDate = dueDate || todo.dueDate;
+    todo.priority = priority || todo.priority;
+    todo.tags = tags ? tags.split(',').map(t => t.trim()) : todo.tags;
+    todo.estimatedTime = estimatedTime ? parseInt(estimatedTime) : todo.estimatedTime;
     todo.updatedAt = new Date();
 
     await todo.save();

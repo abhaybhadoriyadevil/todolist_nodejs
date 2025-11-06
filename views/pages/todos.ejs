@@ -1,0 +1,229 @@
+<%- include('../partials/header') %>
+
+<div class="todo-container">
+    <div class="todo-header">
+        <h1>⚡Manage Tasks</h1>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search tasks..." class="search-input">
+            </div>
+            <div class="filter-options">
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <select id="priorityFilter" class="filter-select">
+                    <option value="all">All Priority</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="all">All Categories</option>
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="health">Health</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Todos list with CRUD operations -->
+    <ul class="todo-list scrollable">
+        <% if (todos && todos.length > 0) { %>
+            <% todos.forEach(function(todo) { %>
+                <li class="todo-item" data-id="<%= todo._id %>" data-status="<%= todo.status %>" data-priority="<%= todo.priority %>" data-category="<%= todo.category %>">
+                    <div class="task-details <%= todo.priority === 'high' ? 'priority-high' : todo.priority === 'low' ? 'priority-low' : 'priority-medium' %>">
+                        <!-- View Mode -->
+                        <div class="task-view-mode">
+                            <div class="task-header">
+                                <h3 class="task-title <%= todo.status === 'completed' ? 'completed' : '' %>"><%= todo.title %></h3>
+                                <div class="task-actions">
+                                    <button class="edit-btn" onclick="toggleEditMode(this)">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <form action="/toggle/<%= todo._id %>" method="POST" style="display:inline;">
+                                        <button type="submit" class="status-btn <%= todo.status === 'completed' ? 'undo-btn' : 'complete-btn' %>">
+                                            <%= todo.status === 'completed' ? 'Undo' : 'Complete' %>
+                                        </button>
+                                    </form>
+                                    <form action="/delete/<%= todo._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this task?')">
+                                        <button type="submit" class="delete-btn">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="task-description"><%= todo.description %></div>
+                            <div class="task-meta">
+                                <% if (todo.dueDate) { %>
+                                    <span class="meta-item">
+                                        <i class="far fa-calendar"></i>
+                                        Due: <%= new Date(todo.dueDate).toLocaleString() %>
+                                    </span>
+                                <% } %>
+                                <span class="meta-item">
+                                    <i class="fas fa-flag"></i>
+                                    Priority: <%= todo.priority %>
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-folder"></i>
+                                    Category: <%= todo.category %>
+                                </span>
+                                <% if (todo.tags && todo.tags.length) { %>
+                                    <div class="task-tags">
+                                        <i class="fas fa-tags"></i>
+                                        <% todo.tags.forEach(function(tag) { %>
+                                            <span class="task-tag"><%= tag %></span>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Edit Mode -->
+                        <div class="task-edit-mode" style="display: none;">
+                            <form action="/update/<%= todo._id %>" method="POST" class="edit-form">
+                                <div class="form-group">
+                                    <input type="text" name="title" value="<%= todo.title %>" class="todo-input" required>
+                                    <textarea name="description" class="todo-textarea"><%= todo.description %></textarea>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Due Date:</label>
+                                        <input type="datetime-local" name="dueDate" 
+                                            value="<%= todo.dueDate ? new Date(todo.dueDate).toISOString().slice(0, 16) : '' %>" 
+                                            class="todo-input">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Priority:</label>
+                                        <select name="priority" class="todo-select">
+                                            <option value="low" <%= todo.priority === 'low' ? 'selected' : '' %>>Low</option>
+                                            <option value="medium" <%= todo.priority === 'medium' ? 'selected' : '' %>>Medium</option>
+                                            <option value="high" <%= todo.priority === 'high' ? 'selected' : '' %>>High</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Category:</label>
+                                        <select name="category" class="todo-select">
+                                            <option value="work" <%= todo.category === 'work' ? 'selected' : '' %>>Work</option>
+                                            <option value="personal" <%= todo.category === 'personal' ? 'selected' : '' %>>Personal</option>
+                                            <option value="shopping" <%= todo.category === 'shopping' ? 'selected' : '' %>>Shopping</option>
+                                            <option value="health" <%= todo.category === 'health' ? 'selected' : '' %>>Health</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tags (comma-separated):</label>
+                                    <input type="text" name="tags" value="<%= todo.tags ? todo.tags.join(', ') : '' %>" class="todo-input">
+                                </div>
+
+                                <div class="edit-actions">
+                                    <button type="submit" class="save-btn">
+                                        <i class="fas fa-save"></i> Save
+                                    </button>
+                                    <button type="button" class="cancel-btn" onclick="toggleEditMode(this)">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            <% }); %>
+        <% } else { %>
+            <li class="no-todos">No tasks found. Add some tasks from the home page!</li>
+        <% } %>
+    </ul>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://kit.fontawesome.com/your-kit-code.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initial animations
+        gsap.from('h1', { opacity: 0, y: -30, duration: 1, ease: 'power3.out' });
+        gsap.from('.todo-item', { 
+            opacity: 0, 
+            y: 20, 
+            duration: 0.5, 
+            stagger: 0.1, 
+            ease: 'power3.out' 
+        });
+
+        // Search and filter functionality
+        let debounceTimer;
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const priorityFilter = document.getElementById('priorityFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const status = statusFilter.value;
+            const priority = priorityFilter.value;
+            const category = categoryFilter.value;
+
+            document.querySelectorAll('.todo-item').forEach(item => {
+                const title = item.querySelector('.task-title').textContent.toLowerCase();
+                const description = item.querySelector('.task-description')?.textContent.toLowerCase() || '';
+                const itemStatus = item.getAttribute('data-status');
+                const itemPriority = item.getAttribute('data-priority');
+                const itemCategory = item.getAttribute('data-category');
+
+                const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+                const matchesStatus = status === 'all' || itemStatus === status;
+                const matchesPriority = priority === 'all' || itemPriority === priority;
+                const matchesCategory = category === 'all' || itemCategory === category;
+
+                if (matchesSearch && matchesStatus && matchesPriority && matchesCategory) {
+                    gsap.to(item, { opacity: 1, y: 0, duration: 0.3, display: '' });
+                } else {
+                    gsap.to(item, { opacity: 0, y: 20, duration: 0.3, display: 'none' });
+                }
+            });
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(applyFilters, 300);
+        });
+
+        [statusFilter, priorityFilter, categoryFilter].forEach(filter => {
+            filter.addEventListener('change', applyFilters);
+        });
+    });
+
+    // Toggle edit mode
+    function toggleEditMode(button) {
+        const todoItem = button.closest('.todo-item');
+        const viewMode = todoItem.querySelector('.task-view-mode');
+        const editMode = todoItem.querySelector('.task-edit-mode');
+        
+        if (editMode.style.display === 'none') {
+            gsap.to(viewMode, { opacity: 0, height: 0, display: 'none', duration: 0.3 });
+            gsap.fromTo(editMode, 
+                { opacity: 0, height: 0 },
+                { opacity: 1, height: 'auto', display: 'block', duration: 0.3 }
+            );
+        } else {
+            gsap.to(editMode, { opacity: 0, height: 0, display: 'none', duration: 0.3 });
+            gsap.fromTo(viewMode, 
+                { opacity: 0, height: 0 },
+                { opacity: 1, height: 'auto', display: 'block', duration: 0.3 }
+            );
+        }
+    }
+</script>
+
+<%- include('../partials/footer') %>

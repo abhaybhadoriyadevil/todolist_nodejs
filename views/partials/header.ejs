@@ -1,20 +1,38 @@
-<header class="futuristic-header">
-    <div class="cyber-line"></div>
-    <nav class="nav-container">
-        <div class="logo">
-            <h1>📝 Todo<span class="accent">Matrix</span></h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'NeoTask' %></title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/styles/todos.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="futuristic-header">
+        <div class="cyber-line"></div>
+        <nav class="nav-container">
+            <div class="logo">
+                <h1>⚡Neo<span class="accent">Task</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Add Task</a>
+                <a href="/todos" class="nav-link">View Tasks</a>
+            </div>
+        </nav>
+    </header>
+
+    <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+        <div class="flash-message flash-success">
+            <i class="fas fa-check-circle"></i> <%= success %>
         </div>
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/about" class="nav-link">About</a>
-            <a href="/contact" class="nav-link">Contact</a>
+    <% } %>
+
+    <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+        <div class="flash-message flash-error">
+            <i class="fas fa-exclamation-circle"></i> <%= error %>
         </div>
-        <div class="search-container">
-            <input type="text" placeholder="Search tasks..." class="search-input">
-            <button class="search-btn">🔍</button>
-        </div>
-    </nav>
-</header>
+    <% } %>
 
 <style>
 @keyframes cyber-glow {

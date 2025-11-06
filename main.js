@@ -27,10 +27,14 @@ app.use(session({
 app.use(flash());
 
 // Todo routes
-app.get('/', todoController.getTodos);
+app.get('/', (req, res) => {
+    res.render('index', { title: 'Add New Task' });
+});
+app.get('/todos', todoController.getTodos);
 app.post('/add', todoController.addTodo);
 app.post('/toggle/:id', todoController.toggleTodo);
 app.post('/delete/:id', todoController.deleteTodo);
+app.post('/update/:id', todoController.updateTodo);
 
 // New pages routes
 app.get('/about', (req, res) => {

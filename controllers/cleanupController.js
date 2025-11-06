@@ -1,4 +1,11 @@
-<%- include('partials/header') %>
+// Function to clean up index.ejs
+exports.cleanupIndexFile = async () => {
+    try {
+        const fs = require('fs').promises;
+        const path = require('path');
+        
+        const indexPath = path.join(__dirname, '..', 'views', 'index.ejs');
+        const newContent = `<%- include('partials/header') %>
 
 <div class="todo-container">
     <div class="todo-header">
@@ -120,4 +127,12 @@
     });
 </script>
 
-<%- include('partials/footer') %>
+<%- include('partials/footer') %>`;
+
+        await fs.writeFile(indexPath, newContent, 'utf8');
+        console.log('Successfully cleaned up index.ejs');
+        
+    } catch (error) {
+        console.error('Error cleaning up index.ejs:', error);
+    }
+};
