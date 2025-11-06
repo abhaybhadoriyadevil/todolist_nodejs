@@ -1,0 +1,61 @@
+<div class="todo-container">
+    <h1>My Todo List</h1>
+    
+    <form action="/add" method="POST" class="todo-form">
+        <input type="text" name="task" class="todo-input" placeholder="Add a new task..." required>
+        <button type="submit" class="todo-button">Add Task</button>
+    </form>
+
+    <ul class="todo-list">
+        <% if (todos && todos.length > 0) { %>
+            <% todos.forEach(todo => { %>
+                <li class="todo-item">
+                    <span class="<%= todo.completed ? 'completed' : '' %>">
+                        <%= todo.task %>
+                    </span>
+                    <div class="todo-actions">
+                        <form action="/toggle/<%= todo._id %>" method="POST" style="display: inline;">
+                            <button type="submit" class="todo-button"><%= todo.completed ? 'Undo' : 'Complete' %></button>
+                        </form>
+                        <form action="/delete/<%= todo._id %>" method="POST" style="display: inline;">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    </div>
+                </li>
+            <% }); %>
+        <% } else { %>
+            <li class="no-todos">No tasks yet. Add one above!</li>
+        <% } %>
+    </ul>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+    // GSAP animations for todo items
+    gsap.from('h1', {
+        opacity: 0,
+        y: -30,
+        duration: 1,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.todo-form', {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        delay: 0.3,
+        ease: 'power3.out'
+    });
+
+    // Animate todo items when they appear
+    const todoItems = document.querySelectorAll('.todo-item');
+    todoItems.forEach((item, index) => {
+        gsap.from(item, {
+            opacity: 0,
+            x: -50,
+            duration: 0.5,
+            delay: 0.5 + (index * 0.1),
+            ease: 'power3.out'
+        });
+    });
+</script>

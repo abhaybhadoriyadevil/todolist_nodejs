@@ -1,0 +1,43 @@
+<!-- About Page -->
+<div class="about-section">
+    <div class="about-content">
+        <h1>About Our Todo App</h1>
+        <p>Welcome to our modern todo application! This app helps you stay organized and manage your tasks efficiently.</p>
+        
+        <div class="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Simple and intuitive interface</li>
+                <li>Real-time updates</li>
+                <li>Responsive design</li>
+                <li>Smooth animations</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // GSAP animations for about page
+    gsap.from('.about-content h1', {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.about-content p', {
+        opacity: 0,
+        y: 20,
+        duration: 1,
+        delay: 0.3,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.features', {
+        opacity: 0,
+        y: 20,
+        duration: 1,
+        delay: 0.6,
+        ease: 'power3.out'
+    });
+</script>
