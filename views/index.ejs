@@ -1,8 +1,8 @@
 <div class="todo-container">
-    <h1>My Todo List</h1>
+    <h1>⚡NeoTask</h1>
     
-    <form action="/add" method="POST" class="todo-form">
-        <input type="text" name="task" class="todo-input" placeholder="Add a new task..." required>
+    <form action="/add" method="POST" class="todo-form" id="todoForm">
+        <input type="text" name="task" class="todo-input" placeholder="Add a new task..." required id="taskInput">
         <button type="submit" class="todo-button">Add Task</button>
     </form>
 
@@ -47,7 +47,39 @@
         ease: 'power3.out'
     });
 
-    // Animate todo items when they appear
+    // Auto-focus input when page loads
+    document.getElementById('taskInput').focus();
+
+    // Handle Enter key press
+    document.getElementById('taskInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('todoForm').submit();
+        }
+    });
+
+    // Animate new todo items
+    gsap.from('.todo-item', {
+        opacity: 0,
+        y: 20,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: 'power3.out'
+    });
+
+    // Animate completed items
+    document.querySelectorAll('.todo-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (this.textContent === 'Complete') {
+                const todoItem = this.closest('.todo-item');
+                gsap.to(todoItem, {
+                    opacity: 0.7,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            }
+        });
+    });
     const todoItems = document.querySelectorAll('.todo-item');
     todoItems.forEach((item, index) => {
         gsap.from(item, {

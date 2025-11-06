@@ -1,3 +1,221 @@
-<header style="background:#333;color:#fff;padding:10px 20px;">
-  <h1>📝 My Todo List</h1>
+<header class="futuristic-header">
+    <div class="cyber-line"></div>
+    <nav class="nav-container">
+        <div class="logo">
+            <h1>📝 Todo<span class="accent">Matrix</span></h1>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact</a>
+        </div>
+        <div class="search-container">
+            <input type="text" placeholder="Search tasks..." class="search-input">
+            <button class="search-btn">🔍</button>
+        </div>
+    </nav>
 </header>
+
+<style>
+@keyframes cyber-glow {
+    0% { box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff; }
+    50% { box-shadow: 0 0 10px #f0f, 0 0 20px #f0f, 0 0 30px #f0f; }
+    100% { box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff; }
+}
+
+@keyframes line-flow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+.cyber-line {
+    height: 2px;
+    background: linear-gradient(90deg, #0ff, #f0f, #0ff);
+    background-size: 200% 100%;
+    animation: line-flow 2s linear infinite, cyber-glow 2s infinite;
+}
+
+.futuristic-header {
+    background: rgba(13, 17, 23, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(72, 149, 239, 0.2);
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    animation: headerSlideDown 0.5s ease-out;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.logo h1 {
+    color: #fff;
+    font-size: 1.8rem;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.accent {
+    color: #0ff;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    position: relative;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 4px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.nav-link:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.search-input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 0.3rem 1rem;
+    outline: none;
+    width: 200px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-btn {
+    background: transparent;
+    border: none;
+    color: #0ff;
+    cursor: pointer;
+    padding: 0.3rem;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    text-shadow: 0 0 10px #0ff;
+    transform: scale(1.1);
+}
+
+@keyframes headerSlideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .search-container {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Highlight current page in navigation
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.style.backgroundColor = 'rgba(0, 255, 255, 0.1)';
+            link.style.textShadow = '0 0 10px rgba(0, 255, 255, 0.5)';
+        }
+    });
+
+    // Add hover effects
+    const links = document.querySelectorAll('.nav-link');
+    links.forEach(link => {
+        link.addEventListener('mouseover', () => {
+            link.style.textShadow = '0 0 10px #0ff';
+        });
+        link.addEventListener('mouseout', () => {
+            if (link.getAttribute('href') !== currentPath) {
+                link.style.textShadow = 'none';
+            }
+        });
+    });
+});
+</script>
+</header>
+<!-- Add this in your <style> block or main CSS -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+@keyframes barMove {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+header nav a:hover {
+  color: #fff;
+  text-shadow: 0 0 10px #39FF14, 0 0 20px #6D00FF;
+  transform: scale(1.1);
+}
+</style>
