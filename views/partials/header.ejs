@@ -16,8 +16,14 @@
                 <h1 >Brahmasmmi <span class="accent" style="font-size: medium;" >Todo-list</span></h1>
             </div>
             <div class="nav-links">
-                <a href="/" class="nav-link">Add Task</a>
-                <a href="/todos" class="nav-link">View Tasks</a>
+                <% if (user) { %>
+                    <a href="/todos" class="nav-link">View Tasks</a>
+                    <a href="/" class="nav-link">Add Task</a>
+                    <a href="/logout" class="nav-link">Logout</a>
+                <% } else { %>
+                    <a href="/login" class="nav-link">Login</a>
+                    <a href="/signup" class="nav-link">Sign Up</a>
+                <% } %>
             </div>
         </nav>
     </header>

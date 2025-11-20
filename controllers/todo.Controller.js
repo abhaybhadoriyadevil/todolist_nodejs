@@ -6,24 +6,24 @@ const Todo = require('../models/todo.models');
  * Get todos with filtering, sorting, and pagination for todos page
  */
 exports.getTodos = async (req, res) => {
-    try {
-        const {
-            search = '',
-            sort = 'createdAt',
-            order = 'desc',
-            status = 'all',
-            priority = 'all',
-            category = 'all',
-            tag = '',
-            startDate = '',
-            endDate = '',
-            page = 1,
-            limit = 10
-        } = req.query;
+  try {
+    const {
+      search = '',
+      sort = 'createdAt',
+      order = 'desc',
+      status = 'all',
+      priority = 'all',
+      category = 'all',
+      tag = '',
+      startDate = '',
+      endDate = '',
+      page = 1,
+      limit = 10
+    } = req.query;
 
     // Build filter conditions
     const filter = {};
-    
+
     // Text search
     if (search) {
       filter.$or = [
@@ -88,17 +88,17 @@ exports.getTodos = async (req, res) => {
 
     // Prepare flash messages if available
     const successMessage = req.flash ? req.flash('success') : null;
-    
+
     res.render('pages/todos', {
-        todos,
-        total,
-        search,
-        status,
-        sort,
-        order,
-        success: successMessage,
-        error: req.flash('error'),
-        stats
+      todos,
+      total,
+      search,
+      status,
+      sort,
+      order,
+      success: successMessage,
+      error: req.flash('error'),
+      stats
     });
   } catch (error) {
     console.error('Error fetching todos:', error);
@@ -107,9 +107,9 @@ exports.getTodos = async (req, res) => {
     if (req.flash) {
       req.flash('error', 'Failed to load todos');
     }
-    res.render('index', { 
+    res.render('index', {
       todos: [],
-      error: 'Failed to load todos. Please try again.' 
+      error: 'Failed to load todos. Please try again.'
     });
   }
 };
@@ -173,15 +173,15 @@ exports.toggleTodo = async (req, res) => {
     }
 
     todo.completed = !todo.completed;
-  todo.completedAt = todo.completed ? new Date() : null;
-  // keep status in sync
-  todo.status = todo.completed ? 'completed' : 'pending';
+    todo.completedAt = todo.completed ? new Date() : null;
+    // keep status in sync
+    todo.status = todo.completed ? 'completed' : 'pending';
     await todo.save();
 
     // For AJAX requests
     if (req.xhr) {
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         completed: todo.completed,
         message: `Task marked as ${todo.completed ? 'completed' : 'incomplete'}`
       });
@@ -192,9 +192,9 @@ exports.toggleTodo = async (req, res) => {
   } catch (error) {
     console.error('Error toggling todo:', error);
     if (req.xhr) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Failed to update task status' 
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to update task status'
       });
     }
     req.flash('error', 'Failed to update task status');
@@ -208,7 +208,7 @@ exports.toggleTodo = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       console.error('Delete failed: Invalid ID format');
       req.flash('error', 'Invalid task ID format');
@@ -218,7 +218,7 @@ exports.deleteTodo = async (req, res) => {
     console.log('Attempting to delete todo with ID:', id);
 
     const result = await Todo.findByIdAndDelete(id);
-    
+
     if (!result) {
       console.error('Delete failed: Task not found with ID:', id);
       req.flash('error', 'Task not found');
@@ -227,7 +227,7 @@ exports.deleteTodo = async (req, res) => {
 
     console.log('Successfully deleted todo with ID:', id);
     req.flash('success', 'Task successfully deleted');
-    
+
     return res.redirect('/todos');
 
   } catch (error) {
@@ -269,10 +269,10 @@ exports.updateTodo = async (req, res) => {
     await todo.save();
 
     if (req.xhr) {
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         todo,
-        message: 'Task updated successfully' 
+        message: 'Task updated successfully'
       });
     }
 
@@ -281,12 +281,74 @@ exports.updateTodo = async (req, res) => {
   } catch (error) {
     console.error('Error updating todo:', error);
     if (req.xhr) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Failed to update task' 
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to update task'
       });
     }
     req.flash('error', 'Failed to update task');
     res.redirect('/');
+  }
+};
+
+/**
+ * API: Get todos
+ */
+exports.getTodosAPI = async (req, res) => {
+  try {
+    const todos = await Todo.find();
+    res.json(todos);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch todos' });
+  }
+};
+
+/**
+ * API: Add todo
+ */
+exports.addTodoAPI = async (req, res) => {
+  try {
+    const { title, description, dueDate, priority, category, tags, estimatedTime } = req.body;
+    const todo = new Todo({
+      title,
+      description,
+      dueDate,
+      priority,
+      category,
+      tags,
+      estimatedTime
+    });
+    await todo.save();
+    res.status(201).json(todo);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create todo' });
+  }
+};
+
+/**
+ * API: Update todo
+ */
+exports.updateTodoAPI = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await Todo.findByIdAndUpdate(id, req.body, { new: true });
+    if (!todo) return res.status(404).json({ error: 'Todo not found' });
+    res.json(todo);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update todo' });
+  }
+};
+
+/**
+ * API: Delete todo
+ */
+exports.deleteTodoAPI = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await Todo.findByIdAndDelete(id);
+    if (!todo) return res.status(404).json({ error: 'Todo not found' });
+    res.json({ message: 'Todo deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete todo' });
   }
 };
