@@ -1,0 +1,67 @@
+name: TodoList Node.js CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI - Install & Build
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
+      - name: Verify application
+        run: |
+          if [ ! -f "server.js" ]; then
+            echo "ERROR: server.js not found."
+            exit 1
+          fi
+
+          if [ ! -f "package.json" ]; then
+            echo "ERROR: package.json not found."
+            exit 1
+          fi
+
+          echo "Application structure verified successfully."
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check server.js
+          node --check main.js
+
+  cd:
+    name: CD - Deployment
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Deployment placeholder
+        run: |
+          echo "CI passed successfully."
+          echo "CD stage is ready."
+          echo "Connect your production server here."
